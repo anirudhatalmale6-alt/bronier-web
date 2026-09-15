@@ -50,6 +50,19 @@ export interface Product {
   pricePerPiece: number
   priceIsPlaceholder: boolean
   orientations: Orientation[]
+  /**
+   * How many slats are milled into ONE panel.
+   *
+   * This is what was wrong: the photo tile was laid down once per panel, and
+   * the tile holds 5-8 slat periods, so a 4,20 m wall drew about 200 strips
+   * where the customer buys 25 pieces. The panel stopped being visible as a
+   * piece at all.
+   *
+   * ASSUMPTION, flagged on screen and in writing: 4 slats across 16,8 cm is a
+   * 4,2 cm slat, which is an ordinary WPC slat. One number to change per
+   * product once he confirms it.
+   */
+  slatsPerPanel?: number
   defaultWaste: number
   colours: Colour[]
   bullets: string[]
@@ -68,11 +81,11 @@ export interface Product {
 // so with "(примерок)".
 const OAKS: Colour[] = [
   { id: 'oak', name: 'Даб', hex: '#835c3e', grain: '#a97e4c',
-    texture: '/textures/oak.jpg', slatsPerTile: 5 },
+    texture: '/textures/oak.jpg', slatsPerTile: 8 },
   { id: 'natural', name: 'Натур', hex: '#a38566', grain: '#b3915f',
     texture: '/textures/natural.jpg', slatsPerTile: 8 },
   { id: 'anthracite', name: 'Антрацит', hex: '#4f4c49', grain: '#2b2e30',
-    texture: '/textures/anthracite.jpg', slatsPerTile: 2 },
+    texture: '/textures/anthracite.jpg', slatsPerTile: 8 },
   { id: 'terracotta', name: 'Теракота', hex: '#b4713d', grain: '#8a4a2a',
     texture: '/textures/terracotta.jpg', slatsPerTile: 2 },
   { id: 'light-oak', name: 'Светол даб', hex: '#d99957', grain: '#c08a3e',
@@ -111,6 +124,7 @@ export const PRODUCTS: Product[] = [
     pricePerPiece: 1200,
     priceIsPlaceholder: true,
     orientations: ['vertical', 'horizontal'],
+    slatsPerPanel: 4,                 // 16,8 / 4 = 4,2 cm per slat
     defaultWaste: 10,
     colours: OAKS,
     bullets: [
@@ -132,6 +146,7 @@ export const PRODUCTS: Product[] = [
     pricePerPiece: 1800,
     priceIsPlaceholder: true,
     orientations: ['vertical', 'horizontal'],
+    slatsPerPanel: 5,                 // 21,9 / 5 = 4,4 cm per slat
     defaultWaste: 10,
     colours: OAKS,
     bullets: [

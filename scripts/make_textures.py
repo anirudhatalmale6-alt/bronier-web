@@ -78,7 +78,34 @@ def slat_pitch(im: Image.Image) -> int | None:
         if s > best_score:
             best_score, best = s, p
     # a flat surface auto-correlates weakly at every lag; demand a real peak
-    return best if best_score > 0.30 else None
+    if best is None or best_score <= 0.30:
+        return None
+
+    # HARMONICS. A pattern with period 50 also correlates strongly at 100, 150,
+    # 200 - and the peak picker happily returns one of those. That is what
+    # happened here: the oak tile was cut at 160px and called five slats, when
+    # the real slat is about 50px and the tile holds sixteen. Everything
+    # downstream then believed a panel had five slats when the picture drew
+    # thirteen, so the "slats per panel" control had almost nothing to crop.
+    #
+    # So walk down the divisors and take the SMALLEST period that still scores
+    # within a whisker of the best. That is the fundamental.
+    def score(p: int) -> float:
+        n = w - p
+        if n < w // 4:
+            return 0.0
+        num = sum(col[i] * col[i + p] for i in range(n)) / n
+        den = (sum(c * c for c in col[:n]) / n) or 1.0
+        return num / den
+
+    fundamental = best
+    for div in range(2, 13):
+        cand = round(best / div)
+        if cand < max(8, w // 200):
+            break
+        if score(cand) >= best_score * 0.80:
+            fundamental = cand
+    return fundamental
 
 
 def make(job) -> dict | None:
@@ -119,6 +146,24 @@ def make(job) -> dict | None:
     OUT.mkdir(parents=True, exist_ok=True)
     dest = OUT / f"{tid}.jpg"
     crop.save(dest, quality=88, optimize=True)
+
+    # Check the claim before writing it down: count the dark grooves actually
+    # in the tile and compare with `repeats`. A manifest that says five when
+    # the file holds sixteen is how this went wrong the first time.
+    if slatted:
+        g = crop.convert("L")
+        row = [g.getpixel((x, g.height // 2)) for x in range(g.width)]
+        mn, mx = min(row), max(row)
+        cut = mn + (mx - mn) * 0.45
+        n, dip = 0, False
+        for v in row:
+            if v < cut and not dip:
+                n, dip = n + 1, True
+            elif v >= cut:
+                dip = False
+        if abs(n - repeats) > max(1, repeats * 0.25):
+            print(f"     WARNING {tid}: tile holds {n} grooves but repeats says {repeats}")
+            repeats = n
 
     st = ImageStat.Stat(crop)
     avg = tuple(round(c) for c in st.mean)

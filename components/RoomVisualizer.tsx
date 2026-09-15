@@ -84,7 +84,7 @@ export function RoomVisualizer({ initial }: { initial?: Product }) {
 
     const across = wallWidth / product.panelWidth
     const down = Math.max(1, wallHeight / product.panelLength)
-    const tex = panelTexture(colour, across, down)
+    const tex = panelTexture(colour, across, down, 64, true, product.slatsPerPanel)
 
     // 1. the material, built on its OWN canvas first.
     //
@@ -237,6 +237,11 @@ export function RoomVisualizer({ initial }: { initial?: Product }) {
           <p className="mt-2 text-xs text-muted">
             {Math.ceil(wallWidth / product.panelWidth)} {L.slatsAcross}
           </p>
+          {product.slatsPerPanel && (
+            <p className="mt-1 text-xs text-muted">
+              {L.slatsPerPanel.replace('{n}', String(product.slatsPerPanel))}
+            </p>
+          )}
 
           <label className="mt-6 block">
             <span className="text-sm text-muted">{L.vizLight}</span>

@@ -5,6 +5,7 @@ import { compareOrientations, mkd } from '@/lib/calc'
 import { L } from '@/lib/i18n'
 import { preloadTextures } from '@/lib/texture'
 import { WallVisualizer } from './WallVisualizer'
+import { PanelDetail } from './PanelDetail'
 import { ColourPicker } from './ColourPicker'
 import { QuoteSummary } from './QuoteSummary'
 
@@ -114,9 +115,19 @@ export function PanelCalculator({ product }: { product: Product }) {
         <h2 className="text-2xl">{L.preview}</h2>
         <div className="mt-5">
           <WallVisualizer wallWidth={w} wallHeight={h} panelWidth={product.panelWidth}
-            panelLength={product.panelLength} orientation={orientation} colour={colour} />
+            panelLength={product.panelLength} orientation={orientation} colour={colour}
+            slatsPerPanel={product.slatsPerPanel} />
+        </div>
+        <div className="mt-5">
+          <PanelDetail panelWidth={product.panelWidth} panelLength={product.panelLength}
+            colour={colour} slatsPerPanel={product.slatsPerPanel} />
         </div>
         <p className="mt-2 text-xs text-muted">{L.dimsNote}</p>
+        {product.slatsPerPanel && (
+          <p className="mt-1 text-xs text-muted">
+            {L.slatsPerPanel.replace('{n}', String(product.slatsPerPanel))}
+          </p>
+        )}
         <div className="mt-6">
           <QuoteSummary lines={[
             `${L.product}: ${product.name}`,
