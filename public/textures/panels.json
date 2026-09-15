@@ -9,6 +9,24 @@
     "source": "IMG_3133.JPG"
   },
   {
+    "id": "wpc-fence-board",
+    "name": "Сива (форма)",
+    "file": "/textures/wpc-fence-board.jpg",
+    "slats": 1,
+    "w": 873,
+    "h": 165,
+    "source": "IMG_3171.JPG"
+  },
+  {
+    "id": "pu-stone-face",
+    "name": "Црн камен (форма)",
+    "file": "/textures/pu-stone-face.jpg",
+    "slats": 1,
+    "w": 753,
+    "h": 493,
+    "source": "IMG_3168.JPG"
+  },
+  {
     "id": "wpc-outdoor-charcoal",
     "name": "Антрацит (фасада)",
     "file": "/textures/wpc-outdoor-charcoal.jpg",

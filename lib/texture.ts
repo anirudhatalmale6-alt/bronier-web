@@ -76,7 +76,19 @@ export function panelTexture(
     const g = cv.getContext('2d')!
     for (let j = 0; j < down; j++) {
       for (let i = 0; i < across; i++) {
-        g.drawImage(photo, 0, 0, srcW, photo.height, i * per, j * rowPx, per, rowPx)
+        // MIRROR ALTERNATE TILES on a seamless material.
+        //
+        // With every tile drawn the same way up, a stone wall showed the same
+        // crag seven times across and three times down - a grid made of the
+        // absence of a grid. Flipping every other tile costs nothing and kills
+        // the repeat. Slat panels are NOT flipped: their repeat is the product.
+        const fx = seams ? false : i % 2 === 1
+        const fy = seams ? false : j % 2 === 1
+        g.save()
+        g.translate(i * per + (fx ? per : 0), j * rowPx + (fy ? rowPx : 0))
+        g.scale(fx ? -1 : 1, fy ? -1 : 1)
+        g.drawImage(photo, 0, 0, srcW, photo.height, 0, 0, per, rowPx)
+        g.restore()
       }
     }
     if (seams) {

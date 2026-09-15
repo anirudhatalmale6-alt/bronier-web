@@ -84,7 +84,7 @@ export function RoomVisualizer({ initial }: { initial?: Product }) {
 
     const across = wallWidth / product.panelWidth
     const down = Math.max(1, wallHeight / product.panelLength)
-    const tex = panelTexture(colour, across, down, 64, true, product.slatsPerPanel)
+    const tex = panelTexture(colour, across, down, 64, !product.seamless, product.slatsPerPanel)
 
     // 1. the material, built on its OWN canvas first.
     //

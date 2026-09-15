@@ -41,6 +41,35 @@ JOBS = [
         "slats": 4,
     },
     {
+        # The fence board: one flat plank with a deep wood grain, NOT slats.
+        # Three colours are in the photo; this takes the grey one, and the
+        # colour is provisional anyway - he said the range gets settled later.
+        "id": "wpc-fence-board",
+        "name": "Сива (форма)",
+        "src": "/var/lib/freelancer/projects/40523265/IMG_3171.JPG",
+        # inset inside the grey board, read off a coordinate grid; the first
+        # attempt ran a rectangle across a board that lies diagonally and
+        # took a wedge of the floor with it
+        "quad": (130, 668, 130, 858, 940, 812, 940, 620),
+        "out_w": 880, "out_h": 200,
+        "slats": 1,
+        # the board runs diagonally, so the floor survives as a TRIANGLE in one
+        # corner - rows and columns are both part board, part floor, and no
+        # amount of edge trimming reaches it. Take a slice off the bottom.
+        "crop_frac": (0.0, 0.0, 1.0, 0.86),
+    },
+    {
+        # PU stone. Irregular torn edges and a continuous rock face - the
+        # opposite of a slat panel, and the reason the stone must be drawn
+        # WITHOUT joint lines.
+        "id": "pu-stone-face",
+        "name": "Црн камен (форма)",
+        "src": "/var/lib/freelancer/projects/40523265/IMG_3168.JPG",
+        "quad": (120, 330, 120, 690, 1020, 700, 1020, 120),
+        "out_w": 760, "out_h": 500,
+        "slats": 1,
+    },
+    {
         "id": "wpc-outdoor-charcoal",
         "name": "Антрацит (фасада)",
         "src": "/var/lib/freelancer/projects/40523265/IMG_3152.JPG",
@@ -312,15 +341,18 @@ def main() -> None:
         # subtracts the lighting gradient first. The glossy indoor board needs
         # the second, the matt outdoor one is better without it - so run both
         # and keep whichever ends up more level, rather than picking for them.
-        best = None
-        for dt in (False, True):
-            q, e = detilt(im, j["quad"], size, detrend=dt)
-            if e is not None and (best is None or abs(e) < abs(best[1])):
-                best = (q, e, dt)
-        if best is None:
-            problems.append(f"{j['id']}: could not find the grooves at all")
-            continue
-        quad, err, dt = best
+        if j["slats"] <= 1:
+            quad, err, dt = list(j["quad"]), 0.0, False
+        else:
+            best = None
+            for dt_try in (False, True):
+                q, e = detilt(im, j["quad"], size, detrend=dt_try)
+                if e is not None and (best is None or abs(e) < abs(best[1])):
+                    best = (q, e, dt_try)
+            if best is None:
+                problems.append(f"{j['id']}: could not find the grooves at all")
+                continue
+            quad, err, dt = best
         print(f"   de-tilt: residual {err:+.1f}px  (detrend={dt})")
         flat = im.transform(size, Image.QUAD, data=tuple(quad), resample=Image.BICUBIC)
         before = flat.size
@@ -332,8 +364,14 @@ def main() -> None:
             problems.append(f"{j['id']}: nothing left after trimming the floor away")
             continue
 
-        edges = groove_ys(flat, 0.30, 0.70, dt)
-        ok, why = check_even(edges, j["slats"], err, flat.width)
+        if j["slats"] <= 1:
+            # A plank or a stone face has no repeating grooves, so there is
+            # nothing to measure levelness against. Flatness here is judged by
+            # the corners alone, and the floor check below still applies.
+            edges, ok, why = [], True, "single face, no slats to level"
+        else:
+            edges = groove_ys(flat, 0.30, 0.70, dt)
+            ok, why = check_even(edges, j["slats"], err, flat.width)
         print(f"{j['id']}: {why} -> {'flat' if ok else 'STILL SKEWED'}")
         if not ok:
             problems.append(f"{j['id']}: {why}")
@@ -365,6 +403,13 @@ def main() -> None:
         # already even at 6% and "correcting" it took it to 12%, because at
         # that level the per-column gains chase noise rather than a gradient.
         # Do not fix what is not broken.
+        cf = j.get("crop_frac")
+        if cf:
+            w0, h0 = flat.size
+            flat = flat.crop((int(cf[0] * w0), int(cf[1] * h0),
+                              int(cf[2] * w0), int(cf[3] * h0)))
+            print(f"   extra crop -> {flat.size[0]}x{flat.size[1]}")
+
         before_spread = _len_spread(flat)
         if before_spread > 0.15:
             levelled = even_lighting(flat)

@@ -8,6 +8,7 @@ export function ColourPicker({ colours, value, onChange }: {
   return (
     <div>
       <div className="text-sm text-muted mb-2">{L.chooseColour}</div>
+      <p className="text-xs text-muted mb-2">{L.provisionalColours}</p>
       <div className="flex flex-wrap gap-3">
         {colours.map((c) => (
           <button key={c.id} onClick={() => onChange(c)} title={c.name}

@@ -116,7 +116,7 @@ export function PanelCalculator({ product }: { product: Product }) {
         <div className="mt-5">
           <WallVisualizer wallWidth={w} wallHeight={h} panelWidth={product.panelWidth}
             panelLength={product.panelLength} orientation={orientation} colour={colour}
-            slatsPerPanel={product.slatsPerPanel} />
+            slatsPerPanel={product.slatsPerPanel} seamless={product.seamless} />
         </div>
         <div className="mt-5">
           <PanelDetail panelWidth={product.panelWidth} panelLength={product.panelLength}

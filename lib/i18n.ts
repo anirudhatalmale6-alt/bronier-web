@@ -48,6 +48,7 @@ export const t = {
     slatsAcross: 'панели по ширина на ѕидот',
     slatsPerPanel: 'Ламели во еден панел: {n} (претпоставка - потврди ја)',
     onePiece: 'Еден панел во вистински однос',
+    provisionalColours: 'Формата е од вистинските производи. Палетата на бои сè уште не е конечна.',
     fenceHeading: 'Конфигуратор за ограда',
     fenceLength: 'Должина на оградата (m)', fenceHeight: 'Висина (m)',
     corners: 'Агли', gates: 'Порти', install: 'Со монтажа',

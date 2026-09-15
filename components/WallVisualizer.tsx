@@ -21,7 +21,7 @@ import { panelTexture, preloadTextures } from '@/lib/texture'
  */
 export function WallVisualizer({
   wallWidth, wallHeight, panelWidth, panelLength, orientation, colour,
-  showSeams = true, slatsPerPanel,
+  showSeams = true, slatsPerPanel, seamless = false,
 }: {
   wallWidth: number
   wallHeight: number
@@ -31,6 +31,8 @@ export function WallVisualizer({
   colour: Colour
   showSeams?: boolean
   slatsPerPanel?: number
+  /** PU stone: torn interlocking edges, so no joint is ever visible */
+  seamless?: boolean
 }) {
   const ref = useRef<HTMLCanvasElement>(null)
   const [texTick, setTexTick] = useState(0)
@@ -111,7 +113,7 @@ export function WallVisualizer({
     // count is exactly what the calculator sells.
     const stepPx = panelWidth * scale
     const lengthPx = panelLength * scale
-    if (showSeams) {
+    if (showSeams && !seamless) {
       // The joint has to beat the photo's OWN grooves, which are already
       // near-black and about 5px wide. A 1,4px dark line among them is
       // invisible - which is why the wall read as one striped field instead of
@@ -180,7 +182,7 @@ export function WallVisualizer({
     g.fillText(`${H.toFixed(2).replace('.', ',')} m`, 0, 0)
     g.restore()
   }, [wallWidth, wallHeight, panelWidth, panelLength, orientation, colour, showSeams,
-      slatsPerPanel, texTick])
+      slatsPerPanel, seamless, texTick])
 
   return (
     <div className="w-full">

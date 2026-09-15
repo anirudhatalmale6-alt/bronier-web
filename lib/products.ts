@@ -36,12 +36,29 @@ export interface Colour {
   slatsPerTile?: number
 }
 
+/**
+ * COLOURS ARE NOT SETTLED. His words: "we will fix the colors at the end. I
+ * just wanted you to see the shape." So everything below is here for its
+ * SHAPE - the profile of the board, the face of the stone - and the range and
+ * the names get replaced when he sends them. The site says so on screen.
+ */
+export const COLOURS_ARE_PROVISIONAL = true
+
 export interface Product {
   slug: string
   name: string
   short: string
   category: 'enterier' | 'eksterier' | 'ograda'
   kind: 'wall_panel' | 'fence'
+  /**
+   * Are the joints between pieces visible?
+   *
+   * For a slat panel, yes - the joint is the product. For PU stone, no: his
+   * photo shows torn, interlocking edges, and the whole point of the sheet is
+   * that you cannot see where one ends. Drawing a 60 x 120 grid over it was
+   * showing a joint the customer will never see.
+   */
+  seamless?: boolean
   /** metres */
   panelWidth: number
   panelLength: number
@@ -108,6 +125,10 @@ const OAKS: Colour[] = [
 ]
 
 const STONES: Colour[] = [
+  // From his photo of the real sheet (IMG_3168): a continuous rock face with
+  // torn, irregular edges - which is why PU stone is drawn seamless.
+  { id: 'pu-stone-face', name: 'Црн камен', hex: '#3f474d', grain: '#2b3237',
+    texture: '/textures/pu-stone-face.jpg' },
   { id: 'stone-white', name: 'Бел камен', hex: '#e2e1e1', grain: '#bdb4a5',
     texture: '/textures/stone-white.jpg' },
   { id: 'stone-grey', name: 'Сив камен', hex: '#6b6c6d', grain: '#87857f',
@@ -174,6 +195,7 @@ export const PRODUCTS: Product[] = [
     short: 'Полиуретански камен - изглед на природен камен, мала тежина.',
     category: 'enterier',
     kind: 'wall_panel',
+    seamless: true,
     panelWidth: 0.6,
     panelLength: 1.2,
     coverage: coverage(0.6, 1.2),
@@ -226,6 +248,8 @@ export const FENCE = {
   boardHeight: 0.15,
   /** width taken out of the run by one gate, metres */
   gateWidth: 1.2,
+  /** the real board face, cut from his photo IMG_3171 - shape, not final colour */
+  boardTexture: '/textures/wpc-fence-board.jpg',
   pricePerBoard: 700,
   pricePerPost: 1500,
   pricePerGate: 12000,

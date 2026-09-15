@@ -121,9 +121,15 @@ function FenceDrawing({ len, h, r, colour }: {
       x += gw
       gatesLeft--
     }
+    // His photo (IMG_3171) shows what a fence board actually is: one flat
+    // plank with a deep wood grain, hollow, stacked between the posts. It is
+    // NOT slats, and it is not two alternating colours - that was my drawing,
+    // not his product.
     for (let b = 0; b < boards; b++) {
       items.push(<rect key={`b${s}-${b}`} x={x} y={y0 + b * bh + 0.6} width={segW} height={bh - 1.2}
-        fill={b % 2 ? colour.grain : colour.hex} rx={1} />)
+        fill={`url(#fenceboard)`} rx={1} />)
+      items.push(<rect key={`bs${s}-${b}`} x={x} y={y0 + (b + 1) * bh - 1.4} width={segW}
+        height={1.6} fill="rgba(0,0,0,0.45)" />)
     }
     items.push(<rect key={'p' + s} x={x - postW / 2} y={y0 - 5} width={postW} height={h * scale + 5}
       fill="#3a3a3a" rx={1} />)
@@ -135,6 +141,12 @@ function FenceDrawing({ len, h, r, colour }: {
   return (
     <div className="mt-5 rounded-lg border border-line overflow-hidden bg-[#f3f2f0]">
       <svg viewBox={`0 0 ${VW} ${VH}`} className="w-full block">
+        <defs>
+          <pattern id="fenceboard" patternUnits="userSpaceOnUse" width={160} height={bh}>
+            <image href={FENCE.boardTexture} x={0} y={0} width={160} height={bh}
+                   preserveAspectRatio="none" />
+          </pattern>
+        </defs>
         <rect x={0} y={ground} width={VW} height={VH - ground} fill="#e7e5e2" />
         {items}
         <text x={pad} y={VH - 12} fontSize="13" fill="#6b6b6b">
