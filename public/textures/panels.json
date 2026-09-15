@@ -1,0 +1,20 @@
+[
+  {
+    "id": "wpc-indoor-anthracite",
+    "name": "Антрацит",
+    "file": "/textures/wpc-indoor-anthracite.jpg",
+    "slats": 4,
+    "w": 693,
+    "h": 299,
+    "source": "IMG_3133.JPG"
+  },
+  {
+    "id": "wpc-outdoor-charcoal",
+    "name": "Антрацит (фасада)",
+    "file": "/textures/wpc-outdoor-charcoal.jpg",
+    "slats": 4,
+    "w": 893,
+    "h": 313,
+    "source": "IMG_3152.JPG"
+  }
+]

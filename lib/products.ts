@@ -79,6 +79,19 @@ export interface Product {
 // The names say what the photograph IS. Nothing here invents a finish name he
 // has never used, and the two that are still drawn rather than photographed say
 // so with "(примерок)".
+// Cut from the photographs he sent of the actual boards (IMG_3133, IMG_3152),
+// rectified by scripts/rectify_panel.py. One tile = ONE PANEL, and both photos
+// show FOUR slats - counted off the cut end, where the extrusion's four hollow
+// chambers are visible, not guessed.
+const REAL_INDOOR: Colour = {
+  id: 'wpc-indoor-anthracite', name: 'Антрацит', hex: '#4a4c4d', grain: '#333536',
+  texture: '/textures/wpc-indoor-anthracite.jpg', slatsPerTile: 4,
+}
+const REAL_OUTDOOR: Colour = {
+  id: 'wpc-outdoor-charcoal', name: 'Антрацит', hex: '#3b4045', grain: '#282c30',
+  texture: '/textures/wpc-outdoor-charcoal.jpg', slatsPerTile: 4,
+}
+
 const OAKS: Colour[] = [
   { id: 'oak', name: 'Даб', hex: '#835c3e', grain: '#a97e4c',
     texture: '/textures/oak.jpg', slatsPerTile: 8 },
@@ -124,9 +137,9 @@ export const PRODUCTS: Product[] = [
     pricePerPiece: 1200,
     priceIsPlaceholder: true,
     orientations: ['vertical', 'horizontal'],
-    slatsPerPanel: 4,                 // 16,8 / 4 = 4,2 cm per slat
+    slatsPerPanel: 4,                 // counted off his photo of the real board
     defaultWaste: 10,
-    colours: OAKS,
+    colours: [REAL_INDOOR, ...OAKS],
     bullets: [
       'Димензии: 16,8 × 290 см',
       'Покриеност: 0,4872 m² по панел',
@@ -146,9 +159,9 @@ export const PRODUCTS: Product[] = [
     pricePerPiece: 1800,
     priceIsPlaceholder: true,
     orientations: ['vertical', 'horizontal'],
-    slatsPerPanel: 5,                 // 21,9 / 5 = 4,4 cm per slat
+    slatsPerPanel: 4,                 // counted off his photo of the real board
     defaultWaste: 10,
-    colours: OAKS,
+    colours: [REAL_OUTDOOR, ...OAKS],
     bullets: [
       'Димензии: 21,9 × 290 см',
       'Покриеност: 0,6351 m² по панел',
