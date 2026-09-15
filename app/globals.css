@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face{font-family:'Jost';src:url('/fonts/Jost-Light.ttf') format('truetype');font-weight:300;font-display:swap}
+@font-face{font-family:'Jost';src:url('/fonts/Jost-ExtraLight.ttf') format('truetype');font-weight:200;font-display:swap}
+@font-face{font-family:'LatoText';src:url('/fonts/Lato-Light.ttf') format('truetype');font-weight:300;font-display:swap}
+@font-face{font-family:'LatoText';src:url('/fonts/Lato-Regular.ttf') format('truetype');font-weight:400;font-display:swap}
+@font-face{font-family:'LatoText';src:url('/fonts/Lato-Medium.ttf') format('truetype');font-weight:500;font-display:swap}
+
+:root{color-scheme:light}
+html{scroll-behavior:smooth}
+body{background:#fff;color:#141414;font-family:'LatoText',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+/* Headings are Lato Light, NOT Jost. Jost has no glyph for ј, ѕ or џ - the
+   letters that make Macedonian Macedonian - so every heading containing a "ј"
+   (which is most of them) fell back to another face mid-word. Jost stays where
+   it belongs: the logo, whose word is Latin. */
+h1,h2,h3,.display{font-family:'LatoText',system-ui,sans-serif;font-weight:300;letter-spacing:-.005em}
+
+/* the sticky mobile contact bar owns the bottom of the screen on phones */
+@media (max-width:767px){ body{padding-bottom:64px} }
+.fade-up{animation:fu .5s ease both}
+@keyframes fu{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
