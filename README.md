@@ -25,6 +25,26 @@ including the one the client warned about:
 
 Horizontal on the same wall is 34, which matches the client's own example.
 
+## Textures come from HIS OWN photographs
+
+`scripts/make_textures.py` cuts tiling textures out of the product photos in
+`public/img/`. Not stock: a stock picture of somebody else's oak slat wall looks
+better and is a lie, and a customer ordering from it receives a different panel.
+
+The tile has to be an **exact whole number of slats** wide or the seam shows as
+a stripe on every repeat, so the pitch is measured by auto-correlating the
+column brightness. Two bugs worth remembering: the score was originally divided
+by a fixed norm, which biased it towards short lags, and the search started at
+w/60 — together they returned a **7-pixel "slat"**, which is JPEG noise. It now
+normalises per sample and bounds the search to 2–24 slats across.
+
+Stone has no pitch; those tiles are mirrored so their edges meet.
+
+One assumption, flagged to the client: **one repeat of a photo = one panel
+width**. That puts the panel joints where the calculator counts them, and makes
+the slats-per-panel whatever his photograph shows. If a tile is really two
+panels wide, it is one number in `products.ts`.
+
 ## What is real and what is a placeholder
 
 **Real** — every panel dimension, because he supplied them in writing, and all

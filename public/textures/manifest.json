@@ -1,0 +1,72 @@
+[
+  {
+    "id": "oak",
+    "name": "Даб",
+    "file": "/textures/oak.jpg",
+    "repeats": 5,
+    "avg": "#835c3e",
+    "w": 438,
+    "h": 420,
+    "source": "akusticen-panel-8300-1.png"
+  },
+  {
+    "id": "natural",
+    "name": "Натур",
+    "file": "/textures/natural.jpg",
+    "repeats": 8,
+    "avg": "#a38566",
+    "w": 285,
+    "h": 420,
+    "source": "akusticen-panel-8300-2.jpg"
+  },
+  {
+    "id": "anthracite",
+    "name": "Антрацит",
+    "file": "/textures/anthracite.jpg",
+    "repeats": 2,
+    "avg": "#4f4c49",
+    "w": 363,
+    "h": 420,
+    "source": "akusticen-panel-8300-3.webp"
+  },
+  {
+    "id": "terracotta",
+    "name": "Теракота",
+    "file": "/textures/terracotta.jpg",
+    "repeats": 2,
+    "avg": "#b4713d",
+    "w": 170,
+    "h": 420,
+    "source": "wpc-nadvoresen-001.jpg"
+  },
+  {
+    "id": "light-oak",
+    "name": "Светол даб",
+    "file": "/textures/light-oak.jpg",
+    "repeats": 3,
+    "avg": "#d99957",
+    "w": 210,
+    "h": 420,
+    "source": "wpc-nadvoresen-002.jpg"
+  },
+  {
+    "id": "stone-grey",
+    "name": "Сив камен",
+    "file": "/textures/stone-grey.jpg",
+    "repeats": 1,
+    "avg": "#6b6c6d",
+    "w": 294,
+    "h": 420,
+    "source": "pu-kamen-1.jpg"
+  },
+  {
+    "id": "stone-white",
+    "name": "Бел камен",
+    "file": "/textures/stone-white.jpg",
+    "repeats": 1,
+    "avg": "#e2e1e1",
+    "w": 354,
+    "h": 420,
+    "source": "pu-kamen-2.jpg"
+  }
+]

@@ -1,6 +1,7 @@
 'use client'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { Colour, Orientation } from '@/lib/products'
+import { panelTexture, preloadTextures } from '@/lib/texture'
 
 /**
  * Draws the chosen product onto a wall at the customer's own measurements.
@@ -14,9 +15,9 @@ import type { Colour, Orientation } from '@/lib/products'
  * point of showing it, and a wall 4,20 m wide with a 16,8 cm panel shows 25
  * seams because it takes 25 panels.
  *
- * The textures are generated here rather than loaded as images. Nothing to
- * download, it retints instantly when a colour is picked, and it is honest:
- * these are placeholder finishes until his real photography arrives.
+ * The material comes from lib/texture.ts - his own product photograph where
+ * there is one, a drawn approximation where there is not. Shared with the
+ * photo-upload visualizer so one swatch cannot mean two different things.
  */
 export function WallVisualizer({
   wallWidth, wallHeight, panelWidth, panelLength, orientation, colour, showSeams = true,
@@ -30,6 +31,15 @@ export function WallVisualizer({
   showSeams?: boolean
 }) {
   const ref = useRef<HTMLCanvasElement>(null)
+  const [texTick, setTexTick] = useState(0)
+
+  // the flat preview and the photo overlay share one material engine, so the
+  // swatch a customer picks looks the same in both
+  useEffect(() => {
+    let live = true
+    preloadTextures([colour]).then(() => { if (live) setTexTick((n) => n + 1) })
+    return () => { live = false }
+  }, [colour])
 
   useEffect(() => {
     const cv = ref.current
@@ -70,32 +80,26 @@ export function WallVisualizer({
     g.rect(x0, y0, wpx, hpx)
     g.clip()
 
-    // base coat
-    g.fillStyle = colour.hex
-    g.fillRect(x0, y0, wpx, hpx)
+    // base coat: his own product photograph where there is one, tiled at the
+    // real panel width, otherwise the drawn fallback
+    const tex = panelTexture(colour, W / panelWidth, Math.max(1, H / panelLength))
+    if (orientation === 'vertical') {
+      g.drawImage(tex, x0, y0, wpx, hpx)
+    } else {
+      // lying down: rotate the material rather than re-generating it
+      g.save()
+      g.translate(x0, y0 + hpx)
+      g.rotate(-Math.PI / 2)
+      g.drawImage(tex, 0, 0, hpx, wpx)
+      g.restore()
+    }
 
+    // The drawn fallback needs its own grooves; a photographed finish already
+    // has them, and drawing a second set on top of a photograph of slats is how
+    // you end up with twice as many slats as the customer will receive.
     const stepPx = panelWidth * scale
     const lengthPx = panelLength * scale
-
-    // grain: fine lines along the panel's length, so the direction of the
-    // material changes with the orientation the customer picked
-    g.strokeStyle = colour.grain
-    g.globalAlpha = 0.5
-    g.lineWidth = 1
-    if (orientation === 'vertical') {
-      for (let x = x0; x < x0 + wpx; x += 3) {
-        g.globalAlpha = 0.10 + ((x * 13) % 7) / 70
-        g.beginPath(); g.moveTo(x, y0); g.lineTo(x, y0 + hpx); g.stroke()
-      }
-    } else {
-      for (let y = y0; y < y0 + hpx; y += 3) {
-        g.globalAlpha = 0.10 + ((y * 13) % 7) / 70
-        g.beginPath(); g.moveTo(x0, y); g.lineTo(x0 + wpx, y); g.stroke()
-      }
-    }
-    g.globalAlpha = 1
-
-    if (showSeams) {
+    if (showSeams && !colour.texture) {
       // The grooves between panels, plus the butt joints where a panel ends.
       const shade = 'rgba(0,0,0,0.30)'
       const light = 'rgba(255,255,255,0.22)'
@@ -158,7 +162,7 @@ export function WallVisualizer({
     g.rotate(-Math.PI / 2)
     g.fillText(`${H.toFixed(2).replace('.', ',')} m`, 0, 0)
     g.restore()
-  }, [wallWidth, wallHeight, panelWidth, panelLength, orientation, colour, showSeams])
+  }, [wallWidth, wallHeight, panelWidth, panelLength, orientation, colour, showSeams, texTick])
 
   return (
     <div className="w-full">

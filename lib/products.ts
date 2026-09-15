@@ -26,6 +26,14 @@ export interface Colour {
   hex: string
   /** Grain colour drawn over it. */
   grain: string
+  /**
+   * A tile cut from HIS OWN product photograph (scripts/make_textures.py).
+   * When present the visualizer uses the photo; the drawn colour stays as the
+   * fallback and as the swatch tint while the image is still loading.
+   */
+  texture?: string
+  /** How many slat periods are in that tile - see the note in texture.ts. */
+  slatsPerTile?: number
 }
 
 export interface Product {
@@ -51,18 +59,33 @@ export interface Product {
 // finishes a customer picks between, and showing them all in grey would make
 // the visualizer useless. The interface is neutral; the material is not.
 // Every name is still a placeholder until he sends his real range.
+// These are cut from HIS OWN product photographs, not stock pictures. A stock
+// photo of somebody else's oak slat wall would look better and would be a lie -
+// a customer ordering from it gets a different product.
+//
+// The names say what the photograph IS. Nothing here invents a finish name he
+// has never used, and the two that are still drawn rather than photographed say
+// so with "(примерок)".
 const OAKS: Colour[] = [
-  { id: 'oak', name: 'Даб (примерок)', hex: '#c69a63', grain: '#a97e4c' },
-  { id: 'walnut', name: 'Орев (примерок)', hex: '#7d5336', grain: '#5f3d27' },
-  { id: 'anthracite', name: 'Антрацит (примерок)', hex: '#3c3f41', grain: '#2b2e30' },
+  { id: 'oak', name: 'Даб', hex: '#835c3e', grain: '#a97e4c',
+    texture: '/textures/oak.jpg', slatsPerTile: 5 },
+  { id: 'natural', name: 'Натур', hex: '#a38566', grain: '#b3915f',
+    texture: '/textures/natural.jpg', slatsPerTile: 8 },
+  { id: 'anthracite', name: 'Антрацит', hex: '#4f4c49', grain: '#2b2e30',
+    texture: '/textures/anthracite.jpg', slatsPerTile: 2 },
+  { id: 'terracotta', name: 'Теракота', hex: '#b4713d', grain: '#8a4a2a',
+    texture: '/textures/terracotta.jpg', slatsPerTile: 2 },
+  { id: 'light-oak', name: 'Светол даб', hex: '#d99957', grain: '#c08a3e',
+    texture: '/textures/light-oak.jpg', slatsPerTile: 3 },
   { id: 'black', name: 'Црна (примерок)', hex: '#222220', grain: '#141413' },
-  { id: 'grey', name: 'Сива (примерок)', hex: '#9b9b97', grain: '#82827e' },
   { id: 'white', name: 'Бела (примерок)', hex: '#ece9e4', grain: '#d8d4cd' },
 ]
 
 const STONES: Colour[] = [
-  { id: 'cream', name: 'Крем камен (примерок)', hex: '#d9d2c6', grain: '#bdb4a5' },
-  { id: 'grey-stone', name: 'Сив камен (примерок)', hex: '#a3a19c', grain: '#87857f' },
+  { id: 'stone-white', name: 'Бел камен', hex: '#e2e1e1', grain: '#bdb4a5',
+    texture: '/textures/stone-white.jpg' },
+  { id: 'stone-grey', name: 'Сив камен', hex: '#6b6c6d', grain: '#87857f',
+    texture: '/textures/stone-grey.jpg' },
   { id: 'dark-stone', name: 'Темен камен (примерок)', hex: '#5d5a56', grain: '#464340' },
 ]
 

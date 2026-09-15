@@ -2,7 +2,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Colour, Product } from '@/lib/products'
 import { PRODUCTS } from '@/lib/products'
-import { panelTexture } from '@/lib/texture'
+import { panelTexture, preloadTextures } from '@/lib/texture'
 import { drawWarped, type Pt } from '@/lib/warp'
 import { L } from '@/lib/i18n'
 import { ColourPicker } from './ColourPicker'
@@ -36,8 +36,19 @@ export function RoomVisualizer({ initial }: { initial?: Product }) {
   const [blend, setBlend] = useState(0.62)
   const [showBefore, setShowBefore] = useState(false)
   const [drag, setDrag] = useState<number | null>(null)
+  const [texTick, setTexTick] = useState(0)
   const cvRef = useRef<HTMLCanvasElement>(null)
   const wrapRef = useRef<HTMLDivElement>(null)
+
+  // Load every photographed finish once, then force one repaint. Without the
+  // repaint the first render draws the fallback and only corrects itself when
+  // something else happens to change.
+  useEffect(() => {
+    let live = true
+    preloadTextures(PRODUCTS.flatMap((p) => p.colours))
+      .then(() => { if (live) setTexTick((t) => t + 1) })
+    return () => { live = false }
+  }, [])
 
   const onFile = useCallback((f: File) => {
     const url = URL.createObjectURL(f)
@@ -119,7 +130,7 @@ export function RoomVisualizer({ initial }: { initial?: Product }) {
     g.lineTo(q[2].x, q[2].y); g.lineTo(q[3].x, q[3].y); g.closePath()
     g.setLineDash([5, 4]); g.strokeStyle = 'rgba(20,20,20,0.55)'; g.lineWidth = 1.5; g.stroke()
     g.setLineDash([])
-  }, [img, quad, colour, product, wallWidth, wallHeight, blend, showBefore, drag])
+  }, [img, quad, colour, product, wallWidth, wallHeight, blend, showBefore, drag, texTick])
 
   const toImg = (e: React.PointerEvent) => {
     const cv = cvRef.current!, img0 = img!
