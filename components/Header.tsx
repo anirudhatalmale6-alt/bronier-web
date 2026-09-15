@@ -8,7 +8,7 @@ const NAV = [
   { href: '/', label: L.navHome },
   { href: '/proizvodi/', label: L.navProducts },
   { href: '/wpc-ograda/', label: L.navFence },
-  { href: '/#vizuelizator', label: L.navVisualizer },
+  { href: '/vizuelizator/', label: L.navVisualizer },
   { href: '/#kontakt', label: L.navContact },
 ]
 

@@ -47,10 +47,15 @@ export interface Product {
   bullets: string[]
 }
 
+// The SITE is black and white now, but a wall panel is not: these are the
+// finishes a customer picks between, and showing them all in grey would make
+// the visualizer useless. The interface is neutral; the material is not.
+// Every name is still a placeholder until he sends his real range.
 const OAKS: Colour[] = [
   { id: 'oak', name: 'Даб (примерок)', hex: '#c69a63', grain: '#a97e4c' },
   { id: 'walnut', name: 'Орев (примерок)', hex: '#7d5336', grain: '#5f3d27' },
   { id: 'anthracite', name: 'Антрацит (примерок)', hex: '#3c3f41', grain: '#2b2e30' },
+  { id: 'black', name: 'Црна (примерок)', hex: '#222220', grain: '#141413' },
   { id: 'grey', name: 'Сива (примерок)', hex: '#9b9b97', grain: '#82827e' },
   { id: 'white', name: 'Бела (примерок)', hex: '#ece9e4', grain: '#d8d4cd' },
 ]

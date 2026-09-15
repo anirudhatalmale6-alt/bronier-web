@@ -52,7 +52,7 @@ export default function Home() {
           <div>
             <h2 className="text-3xl">{L.seeBeforeTitle}</h2>
             <p className="mt-3 text-muted max-w-md">{L.seeBeforeText}</p>
-            <Link href="/proizvodi/wpc-paneli-enterier/#vizuelizator"
+            <Link href="/vizuelizator/"
               className="mt-7 inline-block rounded-full bg-ink px-7 py-3.5 text-white text-sm hover:bg-clay transition-colors">
               {L.seeBeforeCta}
             </Link>
@@ -61,7 +61,7 @@ export default function Home() {
             <div className="aspect-[16/10] rounded-lg overflow-hidden"
               style={{ background: 'repeating-linear-gradient(90deg,#c69a63 0 26px,#a97e4c 26px 28px)' }} />
             <div className="mt-3 flex gap-2">
-              {['#c69a63', '#7d5336', '#3c3f41', '#9b9b97', '#ece9e4'].map((c) => (
+              {['#c69a63', '#7d5336', '#3c3f41', '#222220', '#9b9b97', '#ece9e4'].map((c) => (
                 <span key={c} className="h-8 w-8 rounded border border-line" style={{ background: c }} />
               ))}
             </div>
