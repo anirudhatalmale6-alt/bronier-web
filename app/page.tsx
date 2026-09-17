@@ -3,10 +3,10 @@ import { PRODUCTS, FENCE } from '@/lib/products'
 import { L } from '@/lib/i18n'
 
 const CATS = [
-  { href: '/wpc-ograda/', name: 'WPC огради', img: '/img/wpc-nadvoresen-001.jpg' },
-  { href: '/proizvodi/wpc-paneli-enterier/', name: 'WPC панели за ентериер', img: '/img/akusticen-panel-8300-2.jpg' },
-  { href: '/proizvodi/wpc-paneli-fasada/', name: 'WPC фасадни панели', img: '/img/wpc-nadvoresen-002.jpg' },
-  { href: '/proizvodi/pu-kamen/', name: 'PU камен', img: '/img/pu-kamen-2.jpg' },
+  { href: '/wpc-ograda/', name: 'WPC огради', img: '/img/hero-wpc-ograda.jpg' },
+  { href: '/proizvodi/wpc-paneli-enterier/', name: 'WPC панели за ентериер', img: '/img/hero-wpc-enterier.jpg' },
+  { href: '/proizvodi/wpc-paneli-fasada/', name: 'WPC фасадни панели', img: '/img/hero-wpc-fasada.jpg' },
+  { href: '/proizvodi/pu-kamen/', name: 'PU камен', img: '/img/hero-pu-kamen.jpg' },
   { href: '/proizvodi/bambusov-furnir/', name: 'Бамбусов фурнир', img: '/img/wpc-plocka-021.jpg' },
 ]
 
@@ -24,7 +24,7 @@ export default function Home() {
             </div>
           </div>
           <div className="aspect-[4/3] overflow-hidden rounded-xl bg-soft">
-            <img src="/img/wpc-nadvoresen-001.jpg" alt="" className="h-full w-full object-cover" />
+            <img src="/img/hero-wpc-ograda.jpg" alt="" className="h-full w-full object-cover" />
           </div>
         </div>
       </section>

@@ -65,30 +65,47 @@ export function panelTexture(
     const perPanel = Math.max(1, Math.min(perTile, slatsPerPanel ?? perTile))
     const srcW = Math.round(photo.width * (perPanel / perTile))
     // One repeat of the photograph = one panel.
-    const per = Math.max(24, Math.min(256, Math.round(4096 / across)))
-    cv.width = Math.min(4096, Math.max(64, across * per))
+    // HOW OFTEN THE PICTURE REPEATS.
+    //
+    // On a slat panel the repeat must be exactly one panel, because the joint
+    // between panels is a real thing the customer will see.
+    //
+    // On a seamless material it must NOT be. PU stone has no visible joint, so
+    // tying the picture to the 60 cm panel meant a 4,20 m wall showed the same
+    // photograph twenty-one times, and the repeat became the pattern. The
+    // panel count is a calculation; it does not have to be a drawing. So the
+    // stone repeats every third panel instead, which on the same wall is seven
+    // times fewer.
+    const tilesAcross = seams ? across : Math.max(1, Math.round(across / 3))
+    const tilesDown = seams ? down : Math.max(1, Math.round(down / 2))
+    const per = Math.max(24, Math.min(512, Math.round(4096 / tilesAcross)))
+    cv.width = Math.min(4096, Math.max(64, tilesAcross * per))
     // Tile DOWN as well as across. Stretching one tile over the whole height
     // was fine for a slat panel, which is 2,90 m in one piece and genuinely
     // uniform down its length - but PU stone is 60 x 120 cm, so a 2,70 m wall
     // is three courses, and one stone smeared over the lot looked like rain.
     const rowPx = Math.max(24, Math.round(per * 2.4 * (photo.height / photo.width)))
-    cv.height = Math.min(4096, Math.max(64, rowPx * down))
+    cv.height = Math.min(4096, Math.max(64, rowPx * tilesDown))
     const g = cv.getContext('2d')!
-    for (let j = 0; j < down; j++) {
-      for (let i = 0; i < across; i++) {
-        // MIRROR ALTERNATE TILES on a seamless material.
+    for (let j = 0; j < tilesDown; j++) {
+      for (let i = 0; i < tilesAcross; i++) {
+        // STAGGER the rows, do not mirror them.
         //
-        // With every tile drawn the same way up, a stone wall showed the same
-        // crag seven times across and three times down - a grid made of the
-        // absence of a grid. Flipping every other tile costs nothing and kills
-        // the repeat. Slat panels are NOT flipped: their repeat is the product.
-        const fx = seams ? false : i % 2 === 1
-        const fy = seams ? false : j % 2 === 1
-        g.save()
-        g.translate(i * per + (fx ? per : 0), j * rowPx + (fy ? rowPx : 0))
-        g.scale(fx ? -1 : 1, fy ? -1 : 1)
-        g.drawImage(photo, 0, 0, srcW, photo.height, 0, 0, per, rowPx)
-        g.restore()
+        // Mirroring was worse than the problem it fixed. Flipping a tile makes
+        // its edge match its neighbour exactly, which the eye reads as a
+        // butterfly - the stone wall came out as a column of symmetrical
+        // kaleidoscope patterns, more obviously artificial than plain repeats.
+        //
+        // A half-tile horizontal offset on alternate rows is how real stone is
+        // laid, introduces no symmetry, and moves the joins out of line.
+        const offset = seams ? 0 : (j % 2) * (per / 2)
+        g.drawImage(photo, 0, 0, srcW, photo.height,
+                    i * per - offset, j * rowPx, per, rowPx)
+        // the stagger leaves a gap at the row start; fill it with the tile end
+        if (offset && i === 0) {
+          g.drawImage(photo, 0, 0, srcW, photo.height,
+                      tilesAcross * per - offset, j * rowPx, per, rowPx)
+        }
       }
     }
     if (seams) {

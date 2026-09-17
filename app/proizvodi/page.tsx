@@ -3,9 +3,9 @@ import { PRODUCTS } from '@/lib/products'
 import { L } from '@/lib/i18n'
 
 const IMG: Record<string, string> = {
-  'wpc-paneli-enterier': '/img/akusticen-panel-8300-2.jpg',
-  'wpc-paneli-fasada': '/img/wpc-nadvoresen-002.jpg',
-  'pu-kamen': '/img/pu-kamen-2.jpg',
+  'wpc-paneli-enterier': '/img/hero-wpc-enterier.jpg',
+  'wpc-paneli-fasada': '/img/hero-wpc-fasada.jpg',
+  'pu-kamen': '/img/hero-pu-kamen.jpg',
   'bambusov-furnir': '/img/wpc-plocka-021.jpg',
 }
 
@@ -29,7 +29,7 @@ export default function Catalog() {
         ))}
         <Link href="/wpc-ograda/" className="group block">
           <div className="aspect-[4/3] overflow-hidden rounded-xl bg-soft">
-            <img src="/img/wpc-nadvoresen-001.jpg" alt="" loading="lazy"
+            <img src="/img/hero-wpc-ograda.jpg" alt="" loading="lazy"
               className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]" />
           </div>
           <h2 className="mt-3 text-xl">WPC ограда</h2>

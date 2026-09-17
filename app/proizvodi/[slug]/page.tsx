@@ -17,9 +17,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 }
 
 const IMG: Record<string, string> = {
-  'wpc-paneli-enterier': '/img/akusticen-panel-8300-1.png',
-  'wpc-paneli-fasada': '/img/wpc-nadvoresen-002.jpg',
-  'pu-kamen': '/img/pu-kamen-1.jpg',
+  'wpc-paneli-enterier': '/img/hero-wpc-enterier.jpg',
+  'wpc-paneli-fasada': '/img/hero-wpc-fasada.jpg',
+  'pu-kamen': '/img/hero-pu-kamen.jpg',
   'bambusov-furnir': '/img/wpc-plocka-020.jpg',
 }
 

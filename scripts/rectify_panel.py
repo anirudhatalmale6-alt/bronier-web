@@ -19,7 +19,7 @@ import pathlib
 import statistics
 import sys
 
-from PIL import Image
+from PIL import Image, ImageFilter
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 OUT = ROOT / "public" / "textures"
@@ -68,6 +68,10 @@ JOBS = [
         "quad": (120, 330, 120, 690, 1020, 700, 1020, 120),
         "out_w": 760, "out_h": 500,
         "slats": 1,
+        # stone is tiled many times across a wall, so its big light and dark
+        # patches have to go or the repeat becomes the pattern
+        "flatten": True,
+        "seamless": True,
     },
     {
         "id": "wpc-outdoor-charcoal",
@@ -317,6 +321,93 @@ def check_even(edges: list[int], want_slats: int, residual: float,
 
 
 
+
+def flatten_large_scale(im: Image.Image, keep: float = 0.95) -> Image.Image:
+    """Take the big light and dark patches out, keep the fine texture.
+
+    A stone tile repeated across a wall gives itself away by its LARGE features
+    - one pale corner, one dark band - because those recur on a grid the eye
+    picks out instantly. The fine grain does not repeat visibly at all.
+
+    So divide the tile by a heavily blurred copy of itself. Large-scale
+    variation goes, the rock texture stays, and the same tile laid seven times
+    stops announcing itself. `keep` leaves a little of the variation in, because
+    removing all of it looks like sandpaper.
+    """
+    w, h = im.size
+    blur = im.filter(ImageFilter.GaussianBlur(radius=max(w, h) / 6))
+    src, bl = im.convert("RGB").load(), blur.convert("RGB").load()
+    out = Image.new("RGB", (w, h))
+    op = out.load()
+    tot = [0, 0, 0]
+    for y in range(0, h, max(1, h // 50)):
+        for x in range(0, w, max(1, w // 50)):
+            c = src[x, y]
+            for k in range(3):
+                tot[k] += c[k]
+    n = len(range(0, h, max(1, h // 50))) * len(range(0, w, max(1, w // 50)))
+    mean = [t / n for t in tot]
+    for y in range(h):
+        for x in range(w):
+            c, b = src[x, y], bl[x, y]
+            px = []
+            for k in range(3):
+                g = mean[k] / max(1.0, b[k])
+                g = 1 + keep * (g - 1)
+                px.append(max(0, min(255, int(c[k] * g))))
+            op[x, y] = tuple(px)
+    return out
+
+
+
+def make_seamless(im: Image.Image) -> Image.Image:
+    """Make the tile's left edge match its right, and its top match its bottom.
+
+    Staggering the rows moved the joins around but did not remove them: the
+    tile's left edge still did not match its right, so every join was a visible
+    step. This is the standard fix - take a copy wrapped by half the tile in
+    both directions, so what was an edge is now the middle, and cross-fade the
+    two with a mask that is strongest at the edges.
+
+    The centre of the tile is left alone, so the rock keeps its character.
+    """
+    w, h = im.size
+    wrapped = Image.new("RGB", (w, h))
+    wrapped.paste(im.crop((w // 2, h // 2, w, h)), (0, 0))
+    wrapped.paste(im.crop((0, h // 2, w // 2, h)), (w - w // 2, 0))
+    wrapped.paste(im.crop((w // 2, 0, w, h // 2)), (0, h - h // 2))
+    wrapped.paste(im.crop((0, 0, w // 2, h // 2)), (w - w // 2, h - h // 2))
+
+    # mask: 0 in the middle, 1 at the border, smooth between
+    mask = Image.new("L", (w, h))
+    mp = mask.load()
+    for y in range(h):
+        fy = 1.0 - min(y, h - 1 - y) / (h / 2)
+        for x in range(w):
+            fx = 1.0 - min(x, w - 1 - x) / (w / 2)
+            f = max(fx, fy) ** 1.6
+            mp[x, y] = int(max(0.0, min(1.0, f)) * 255)
+    return Image.composite(wrapped, im, mask)
+
+
+def _edge_mismatch(im: Image.Image) -> float:
+    """How badly the tile fails to meet itself, 0 = perfect."""
+    g = im.convert("L")
+    w, h = g.size
+    px = g.load()
+    lr = sum(abs(px[0, y] - px[w - 1, y]) for y in range(h)) / h
+    tb = sum(abs(px[x, 0] - px[x, h - 1]) for x in range(w)) / w
+    return (lr + tb) / 2
+
+
+def _big_variation(im: Image.Image) -> float:
+    """Spread of the LARGE features only - the thing that makes a repeat show."""
+    small = im.convert("L").resize((12, 12), Image.BOX)
+    v = list(small.getdata())
+    m = sum(v) / len(v)
+    return (sum((x - m) ** 2 for x in v) / len(v)) ** 0.5 / (m or 1)
+
+
 def _len_spread(im: Image.Image) -> float:
     """How much the brightness swings along the length, as a fraction."""
     w, h = im.size
@@ -423,6 +514,25 @@ def main() -> None:
         else:
             print(f"   lighting along the board: {before_spread*100:.0f}% - "
                   f"already even, left alone")
+
+        if j.get("seamless"):
+            before = _edge_mismatch(flat)
+            flat = make_seamless(flat)
+            after = _edge_mismatch(flat)
+            print(f"   edge mismatch {before:.1f} -> {after:.1f} (0 = tiles perfectly)")
+            if after > before * 0.5:
+                problems.append(f"{j['id']}: edges still do not meet "
+                                f"({before:.1f} -> {after:.1f})")
+                continue
+
+        if j.get("flatten"):
+            before = _big_variation(flat)
+            flat = flatten_large_scale(flat)
+            after = _big_variation(flat)
+            print(f"   large-scale variation {before*100:.0f}% -> {after*100:.0f}%")
+            if after >= before:
+                problems.append(f"{j['id']}: flattening did not reduce the patchiness")
+                continue
 
         dest = OUT / f"{j['id']}.jpg"
         flat.save(dest, quality=90, optimize=True)
