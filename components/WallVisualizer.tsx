@@ -88,7 +88,7 @@ export function WallVisualizer({
     // real panel width, otherwise the drawn fallback
     // seams=false: the joints are drawn on the canvas below, at final scale
     const tex = panelTexture(colour, W / panelWidth, Math.max(1, H / panelLength),
-                             64, false, slatsPerPanel)
+                             64, false, slatsPerPanel, W / H)
     if (orientation === 'vertical') {
       g.drawImage(tex, x0, y0, wpx, hpx)
     } else {

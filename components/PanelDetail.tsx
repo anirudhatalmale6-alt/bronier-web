@@ -61,7 +61,8 @@ export function PanelDetail({
     const w = cssW - padX * 2
     const h = cssH - padY * 2
 
-    const tex = panelTexture(colour, 1, 1, 64, false, slatsPerPanel)
+    const tex = panelTexture(colour, 1, 1, 64, false, slatsPerPanel,
+                            panelLength / panelWidth)
     g.save()
     g.beginPath(); g.rect(padX, padY, w, h); g.clip()
     // rotate so the slats run across the short side, as they do on the real piece

@@ -65,7 +65,11 @@ JOBS = [
         "id": "pu-stone-face",
         "name": "Црн камен (форма)",
         "src": "/var/lib/freelancer/projects/40523265/IMG_3168.JPG",
-        "quad": (120, 330, 120, 690, 1020, 700, 1020, 120),
+        # INSIDE the torn edge. The sheet is deliberately ragged along the
+        # bottom so the panels interlock, and my first crop included it -
+        # so every tile carried a little notch of shadow, and the wall came
+        # out pocked with them at regular intervals.
+        "quad": (150, 345, 150, 615, 1005, 655, 1005, 150),
         "out_w": 760, "out_h": 500,
         "slats": 1,
         # stone is tiled many times across a wall, so its big light and dark
@@ -515,6 +519,22 @@ def main() -> None:
             print(f"   lighting along the board: {before_spread*100:.0f}% - "
                   f"already even, left alone")
 
+        # ORDER MATTERS. Flatten first, seamless second.
+        #
+        # Run the other way round, flattening divides the tile by a blurred
+        # copy of itself AFTER the edges have been matched - and the blur is
+        # different at the left edge than at the right, so it pulls them apart
+        # again. The edge mismatch came back and the wall got a hard vertical
+        # line straight down the middle, which is what the client photographed.
+        if j.get("flatten"):
+            before = _big_variation(flat)
+            flat = flatten_large_scale(flat)
+            after = _big_variation(flat)
+            print(f"   large-scale variation {before*100:.0f}% -> {after*100:.0f}%")
+            if after >= before:
+                problems.append(f"{j['id']}: flattening did not reduce the patchiness")
+                continue
+
         if j.get("seamless"):
             before = _edge_mismatch(flat)
             flat = make_seamless(flat)
@@ -523,15 +543,6 @@ def main() -> None:
             if after > before * 0.5:
                 problems.append(f"{j['id']}: edges still do not meet "
                                 f"({before:.1f} -> {after:.1f})")
-                continue
-
-        if j.get("flatten"):
-            before = _big_variation(flat)
-            flat = flatten_large_scale(flat)
-            after = _big_variation(flat)
-            print(f"   large-scale variation {before*100:.0f}% -> {after*100:.0f}%")
-            if after >= before:
-                problems.append(f"{j['id']}: flattening did not reduce the patchiness")
                 continue
 
         dest = OUT / f"{j['id']}.jpg"

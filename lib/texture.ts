@@ -52,6 +52,8 @@ export function panelTexture(
   seams = true,
   /** slats milled into one panel - see the note above */
   slatsPerPanel?: number,
+  /** wall width / wall height, so a seamless tile is not distorted */
+  wallAspect?: number,
 ): HTMLCanvasElement {
   const across = Math.max(1, Math.ceil(panelsAcross))
   const down = Math.max(1, Math.ceil(panelsDown))
@@ -72,40 +74,44 @@ export function panelTexture(
     //
     // On a seamless material it must NOT be. PU stone has no visible joint, so
     // tying the picture to the 60 cm panel meant a 4,20 m wall showed the same
-    // photograph twenty-one times, and the repeat became the pattern. The
-    // panel count is a calculation; it does not have to be a drawing. So the
-    // stone repeats every third panel instead, which on the same wall is seven
-    // times fewer.
+    // photograph twenty-one times, and the repeat became the pattern.
     const tilesAcross = seams ? across : Math.max(1, Math.round(across / 3))
-    const tilesDown = seams ? down : Math.max(1, Math.round(down / 2))
     const per = Math.max(24, Math.min(512, Math.round(4096 / tilesAcross)))
     cv.width = Math.min(4096, Math.max(64, tilesAcross * per))
-    // Tile DOWN as well as across. Stretching one tile over the whole height
-    // was fine for a slat panel, which is 2,90 m in one piece and genuinely
-    // uniform down its length - but PU stone is 60 x 120 cm, so a 2,70 m wall
-    // is three courses, and one stone smeared over the lot looked like rain.
-    const rowPx = Math.max(24, Math.round(per * 2.4 * (photo.height / photo.width)))
+
+    // THE TILE MUST KEEP ITS OWN SHAPE.
+    //
+    // The old code set the row height from a fixed 2.4 factor. On a slat panel
+    // that is harmless - a slat looks the same however it is stretched down its
+    // length. On stone it was fatal: a landscape photograph of rock was being
+    // squeezed into a portrait cell, so the wall came out looking like motion
+    // blur rather than stone.
+    //
+    // So the tile is drawn at its OWN aspect ratio, and the number of rows is
+    // whatever then fills a canvas shaped like the wall.
+    const srcAspect = photo.width / photo.height
+    let rowPx: number
+    let tilesDown: number
+    if (seams) {
+      rowPx = Math.max(24, Math.round(per * 2.4 / srcAspect))
+      tilesDown = down
+    } else {
+      rowPx = Math.max(24, Math.round(per / srcAspect))
+      const wantH = cv.width / Math.max(0.2, wallAspect ?? (across / Math.max(1, down)))
+      tilesDown = Math.max(1, Math.round(wantH / rowPx))
+    }
     cv.height = Math.min(4096, Math.max(64, rowPx * tilesDown))
+
     const g = cv.getContext('2d')!
     for (let j = 0; j < tilesDown; j++) {
-      for (let i = 0; i < tilesAcross; i++) {
-        // STAGGER the rows, do not mirror them.
-        //
-        // Mirroring was worse than the problem it fixed. Flipping a tile makes
-        // its edge match its neighbour exactly, which the eye reads as a
-        // butterfly - the stone wall came out as a column of symmetrical
-        // kaleidoscope patterns, more obviously artificial than plain repeats.
-        //
-        // A half-tile horizontal offset on alternate rows is how real stone is
-        // laid, introduces no symmetry, and moves the joins out of line.
-        const offset = seams ? 0 : (j % 2) * (per / 2)
+      // Half-tile offset on alternate rows, the way stone is actually laid.
+      // Draw one column BEYOND each end rather than wrapping a copy round -
+      // the wrap left a hard vertical seam straight down the middle of the
+      // wall, which is the line he photographed and sent back.
+      const offset = seams ? 0 : (j % 2) * (per / 2)
+      for (let i = -1; i <= tilesAcross; i++) {
         g.drawImage(photo, 0, 0, srcW, photo.height,
-                    i * per - offset, j * rowPx, per, rowPx)
-        // the stagger leaves a gap at the row start; fill it with the tile end
-        if (offset && i === 0) {
-          g.drawImage(photo, 0, 0, srcW, photo.height,
-                      tilesAcross * per - offset, j * rowPx, per, rowPx)
-        }
+                    i * per + offset, j * rowPx, per, rowPx)
       }
     }
     if (seams) {
@@ -127,6 +133,7 @@ export function panelTexture(
   }
 
   // ---- drawn fallback, for a finish he has not photographed yet -----------
+  // (uses `across`/`down` directly - it has no photograph to keep square)
   const w = Math.min(4096, Math.max(64, Math.round(across * pxPerPanel)))
   const h = Math.min(4096, Math.max(64, Math.round(down * pxPerPanel * 3)))
   cv.width = w
